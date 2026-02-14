@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // ─── DATA ───
 const TYPING_TITLES = [
@@ -15,16 +15,6 @@ const VALUE_PROPS = [
   { icon: "📈", title: "Insight Delivery", desc: "Translating complex data into actionable business insights" },
 ];
 
-const SKILLS_RADAR = [
-  { skill: "SQL", level: 95 },
-  { skill: "Python", level: 85 },
-  { skill: "Tableau", level: 90 },
-  { skill: "Power BI", level: 88 },
-  { skill: "dbt Cloud", level: 85 },
-  { skill: "AWS", level: 80 },
-  { skill: "ETL/ELT", level: 90 },
-  { skill: "Data Modeling", level: 88 },
-];
 
 const SKILL_CATEGORIES = {
   "Programming & Scripting": ["SQL", "Python", "Pandas", "NumPy", "PySpark", "Matplotlib", "Plotly", "Jinja", "R"],
@@ -187,26 +177,6 @@ function AnimatedStat({ end, suffix, label }) {
   );
 }
 
-function SkillBar({ skill, level, delay }) {
-  const ref = useRef();
-  const visible = useInView(ref, 0.2);
-  return (
-    <div ref={ref} style={{ marginBottom: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>{skill}</span>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#6366f1" }}>{level}%</span>
-      </div>
-      <div style={{ height: 8, background: "#eee", borderRadius: 4, overflow: "hidden" }}>
-        <div style={{
-          height: "100%", borderRadius: 4,
-          background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
-          width: visible ? `${level}%` : "0%",
-          transition: `width 1s ease ${delay}s`,
-        }} />
-      </div>
-    </div>
-  );
-}
 
 function LearningTicker({ items }) {
   const doubled = [...items, ...items];
