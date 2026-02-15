@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 // ─── DATA ───
 const TYPING_TITLES = [
@@ -15,6 +15,16 @@ const VALUE_PROPS = [
   { icon: "📈", title: "Insight Delivery", desc: "Translating complex data into actionable business insights" },
 ];
 
+const SKILLS_RADAR = [
+  { skill: "SQL", level: 95 },
+  { skill: "Python", level: 85 },
+  { skill: "Tableau", level: 90 },
+  { skill: "Power BI", level: 88 },
+  { skill: "dbt Cloud", level: 85 },
+  { skill: "AWS", level: 80 },
+  { skill: "ETL/ELT", level: 90 },
+  { skill: "Data Modeling", level: 88 },
+];
 
 const SKILL_CATEGORIES = {
   "Programming & Scripting": ["SQL", "Python", "Pandas", "NumPy", "PySpark", "Matplotlib", "Plotly", "Jinja", "R"],
@@ -177,6 +187,26 @@ function AnimatedStat({ end, suffix, label }) {
   );
 }
 
+function SkillBar({ skill, level, delay }) {
+  const ref = useRef();
+  const visible = useInView(ref, 0.2);
+  return (
+    <div ref={ref} style={{ marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>{skill}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#6366f1" }}>{level}%</span>
+      </div>
+      <div style={{ height: 8, background: "#eee", borderRadius: 4, overflow: "hidden" }}>
+        <div style={{
+          height: "100%", borderRadius: 4,
+          background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
+          width: visible ? `${level}%` : "0%",
+          transition: `width 1s ease ${delay}s`,
+        }} />
+      </div>
+    </div>
+  );
+}
 
 function LearningTicker({ items }) {
   const doubled = [...items, ...items];
@@ -234,21 +264,21 @@ function TableauSection() {
 function ProjectCard({ p, i }) {
   return (
     <FadeIn delay={i * 0.08}>
-      <div style={{ background: "#fff", borderRadius: 12, padding: 28, border: "1px solid #e8e8e8", transition: "transform 0.2s, box-shadow 0.2s", height: "100%", display: "flex", flexDirection: "column" }}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 24, border: "1px solid #e8e8e8", transition: "transform 0.2s, box-shadow 0.2s", height: "100%", display: "flex", flexDirection: "column", boxSizing: "border-box" }}
         onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
         onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
       >
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#6366f1", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 10 }}>{p.category}</span>
-        <h3 style={{ fontSize: 17, fontWeight: 700, margin: "0 0 10px", lineHeight: 1.3 }}>{p.title}</h3>
-        <p style={{ fontSize: 14, color: "#666", lineHeight: 1.7, flex: 1 }}>{p.description}</p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 16 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#6366f1", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>{p.category}</span>
+        <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 8px", lineHeight: 1.3 }}>{p.title}</h3>
+        <p style={{ fontSize: 13, color: "#666", lineHeight: 1.6, flex: 1, margin: 0 }}>{p.description}</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
           {p.tags.map((t) => (
-            <span key={t} style={{ fontSize: 11, padding: "4px 10px", background: "#ede9fe", color: "#6366f1", borderRadius: 4, fontWeight: 600 }}>{t}</span>
+            <span key={t} style={{ fontSize: 11, padding: "3px 8px", background: "#ede9fe", color: "#6366f1", borderRadius: 4, fontWeight: 600 }}>{t}</span>
           ))}
         </div>
         {p.github && (
           <a href={p.github} target="_blank" rel="noopener noreferrer"
-            style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 16, fontSize: 13, fontWeight: 600, color: "#6366f1", textDecoration: "none", padding: "6px 14px", border: "1px solid #e0e0e0", borderRadius: 6, transition: "background 0.2s, border-color 0.2s", alignSelf: "flex-start" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 12, fontSize: 13, fontWeight: 600, color: "#6366f1", textDecoration: "none", padding: "5px 12px", border: "1px solid #e0e0e0", borderRadius: 6, transition: "background 0.2s, border-color 0.2s", alignSelf: "flex-start" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "#ede9fe"; e.currentTarget.style.borderColor = "#6366f1"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "#e0e0e0"; }}
           >⌨ View on GitHub</a>
@@ -264,8 +294,8 @@ function ExpAnimatedStat({ end, suffix, label }) {
   const val = useAnimatedCounter(end, suffix, 1200, visible);
   return (
     <div ref={ref}>
-      <div style={{ fontSize: 26, fontWeight: 800, color: "#6366f1" }}>{val}</div>
-      <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{label}</div>
+      <div style={{ fontSize: 22, fontWeight: 800, color: "#6366f1" }}>{val}</div>
+      <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>{label}</div>
     </div>
   );
 }
@@ -469,19 +499,23 @@ export default function Portfolio() {
               const isLeft = i % 2 === 0;
               return (
                 <FadeIn key={i} delay={i * 0.2}>
-                  <div style={{ display: "flex", justifyContent: isLeft ? "flex-start" : "flex-end", position: "relative", marginBottom: 64 }}>
-                    <div style={{ position: "absolute", left: "50%", top: 32, transform: "translateX(-50%)", width: 18, height: 18, borderRadius: "50%", background: "#fafafa", border: "2px solid #6366f1", zIndex: 2 }} />
-                    <div style={{ width: "44%", background: "#fff", borderRadius: 16, padding: 28, border: "1px solid #e8e8e8", transition: "transform 0.3s, box-shadow 0.3s" }}
+                  <div style={{ display: "flex", justifyContent: isLeft ? "flex-start" : "flex-end", position: "relative", marginBottom: 48, paddingLeft: isLeft ? 0 : 0, paddingRight: isLeft ? 0 : 0 }}>
+                    <div style={{ position: "absolute", left: "50%", top: 28, transform: "translateX(-50%)", width: 16, height: 16, borderRadius: "50%", background: "#fafafa", border: "2px solid #6366f1", zIndex: 2 }} />
+                    <div style={{
+                      width: "46%", background: "#fff", borderRadius: 14, padding: "24px 24px 20px",
+                      border: "1px solid #e8e8e8", transition: "transform 0.3s, box-shadow 0.3s",
+                      marginLeft: isLeft ? 0 : "auto", marginRight: isLeft ? "auto" : 0,
+                    }}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                     >
-                      <h3 style={{ fontSize: 18, fontWeight: 700, color: "#1a1a1a", margin: "0 0 2px" }}>{exp.company}</h3>
-                      <p style={{ fontSize: 14, color: "#888", margin: "0 0 14px" }}>{exp.role} · {exp.period}</p>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: "#6366f1", background: "#ede9fe", padding: "5px 14px", borderRadius: 20, border: "1px solid #ddd5fe", marginBottom: 16 }}>
+                      <h3 style={{ fontSize: 17, fontWeight: 700, color: "#1a1a1a", margin: "0 0 4px", lineHeight: 1.3 }}>{exp.company}</h3>
+                      <p style={{ fontSize: 13, color: "#888", margin: "0 0 12px", lineHeight: 1.4 }}>{exp.role} · {exp.period}</p>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "#6366f1", background: "#ede9fe", padding: "4px 12px", borderRadius: 20, border: "1px solid #ddd5fe", marginBottom: 12 }}>
                         ✦ {exp.tag}
                       </span>
-                      <p style={{ fontSize: 14, color: "#555", lineHeight: 1.7, margin: "0 0 20px" }}>{exp.description}</p>
-                      <div style={{ display: "flex", gap: 32 }}>
+                      <p style={{ fontSize: 13, color: "#555", lineHeight: 1.65, margin: "0 0 16px" }}>{exp.description}</p>
+                      <div style={{ display: "flex", gap: 28 }}>
                         {exp.stats.map((s) => (
                           <ExpAnimatedStat key={s.label} end={s.value} suffix={s.suffix} label={s.label} />
                         ))}
@@ -495,29 +529,6 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* CERTIFICATIONS */}
-      <section style={{ padding: "80px 24px", background: "#fff" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <FadeIn>
-            <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8, letterSpacing: "-0.5px" }}>Certifications</h2>
-            <div style={{ width: 48, height: 4, background: "#6366f1", borderRadius: 4, marginBottom: 40 }} />
-          </FadeIn>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 20 }}>
-            {CERTIFICATIONS.map((c, i) => (
-              <FadeIn key={c.name} delay={i * 0.1}>
-                <div style={{ background: "#fafafa", borderRadius: 12, padding: 24, border: "1px solid #eee", textAlign: "center", transition: "transform 0.2s", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 160 }}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-                >
-                  <div style={{ fontSize: 32, marginBottom: 10 }}>{c.icon}</div>
-                  <h3 style={{ fontSize: 14, fontWeight: 700, margin: "0 0 4px", color: "#1a1a1a" }}>{c.name}</h3>
-                  <p style={{ fontSize: 13, color: "#888", margin: 0 }}>{c.issuer} · {c.year}</p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* PROJECTS */}
       <section id="projects" style={{ padding: "100px 24px", background: "#fafafa" }}>
@@ -536,7 +547,7 @@ export default function Portfolio() {
             </div>
           </FadeIn>
           {activeFilter === "Tableau" ? <TableauSection /> : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20, alignItems: "stretch" }}>
               {filtered.map((p, i) => <ProjectCard key={p.title} p={p} i={i} />)}
             </div>
           )}
